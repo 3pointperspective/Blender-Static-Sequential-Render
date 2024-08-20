@@ -11,7 +11,7 @@ import os
 from bpy.props import StringProperty, BoolProperty, PointerProperty
 from bpy.types import Operator, Panel, PropertyGroup
 
-class BatchRendererProperties(PropertyGroup):
+class StaticSequenceExporterProperties(PropertyGroup):
     render_collection: StringProperty(
         name="Render Collection",
         description="Select the collection for objects to be rendered",
@@ -25,12 +25,12 @@ class BatchRendererProperties(PropertyGroup):
     output_path: StringProperty(
         name="Output Path",
         description="Select the output path",
-         default=r"C:\Users\[user]\Desktop\\",
+        default=r"C:\Users\[user]\Desktop\\",
         subtype='DIR_PATH'
     )
     use_cycles: BoolProperty(
         name="Use Cycles",
-        description="If not Cycles, Eevee is default",
+        description="Toggle between Eevee and Cycles",
         default=False
     )
     transparent_film: BoolProperty(
@@ -45,12 +45,12 @@ class BatchRendererProperties(PropertyGroup):
         poll=lambda self, obj: obj.type == 'CAMERA'
     )
 
-class RENDER_OT_batch_render(Operator):
-    bl_idname = "render.batch_render"
+class STATICSEQUENCE_OT_export(Operator):
+    bl_idname = "static_sequence.export"
     bl_label = "Begin Render Sequence"
     
     def execute(self, context):
-        props = context.scene.batch_renderer_props
+        props = context.scene.static_sequence_exporter_props
         
         collection_name = props.render_collection
         lighting_collection_name = props.lighting_collection
@@ -120,16 +120,16 @@ class RENDER_OT_batch_render(Operator):
         
         return {'FINISHED'}
 
-class RENDER_PT_batch_render_panel(Panel):
-    bl_label = "Static Image Batch Exporter"
-    bl_idname = "RENDER_PT_batch_render_panel"
+class STATICSEQUENCE_PT_export_panel(Panel):
+    bl_label = "Static Sequence Exporter"
+    bl_idname = "STATICSEQUENCE_PT_export_panel"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_category = "Static Image Batch Exporter"
+    bl_category = "Static Sequence Exporter"
 
     def draw(self, context):
         layout = self.layout
-        props = context.scene.batch_renderer_props
+        props = context.scene.static_sequence_exporter_props
         
         layout.prop(props, "render_collection")
         layout.prop(props, "lighting_collection")
@@ -138,19 +138,19 @@ class RENDER_PT_batch_render_panel(Panel):
         layout.prop(props, "transparent_film")
         layout.prop(props, "camera_object")
         
-        layout.operator("render.batch_render", text="Begin Render Sequence")
+        layout.operator("static_sequence.export", text="Begin Render Sequence")
 
 def register():
-    bpy.utils.register_class(BatchRendererProperties)
-    bpy.utils.register_class(RENDER_OT_batch_render)
-    bpy.utils.register_class(RENDER_PT_batch_render_panel)
-    bpy.types.Scene.batch_renderer_props = PointerProperty(type=BatchRendererProperties)
+    bpy.utils.register_class(StaticSequenceExporterProperties)
+    bpy.utils.register_class(STATICSEQUENCE_OT_export)
+    bpy.utils.register_class(STATICSEQUENCE_PT_export_panel)
+    bpy.types.Scene.static_sequence_exporter_props = PointerProperty(type=StaticSequenceExporterProperties)
 
 def unregister():
-    bpy.utils.unregister_class(BatchRendererProperties)
-    bpy.utils.unregister_class(RENDER_OT_batch_render)
-    bpy.utils.unregister_class(RENDER_PT_batch_render_panel)
-    del bpy.types.Scene.batch_renderer_props
+    bpy.utils.unregister_class(StaticSequenceExporterProperties)
+    bpy.utils.unregister_class(STATICSEQUENCE_OT_export)
+    bpy.utils.unregister_class(STATICSEQUENCE_PT_export_panel)
+    del bpy.types.Scene.static_sequence_exporter_props
 
 if __name__ == "__main__":
     register()
